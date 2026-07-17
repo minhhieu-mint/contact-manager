@@ -1,14 +1,43 @@
 import json
+def validate_name(name: str) -> bool:
+    if not name.strip():
+        print("Name cannot be empty!")
+        return False
 
+    if len(name) > 50:
+        print("Name is too long!")
+        return False
+
+    return True
+
+def validate_phone(phone: str) -> bool:
+    if not phone.isdigit():
+        print("Phone number must contain digits only!")
+        return False
+    if not 9 <= len(phone) <= 15:
+        print("Phone number must be between 9 and 15 digits!")
+        return False
+    
+    return True
+
+def validate_email(email: str) -> bool:
+    if len(email) > 254:
+        print("Email is too long!")
+        return False
+    if "@" not in email:
+        print("Email must contain '@'!")
+        return False
+    
+    return True
 
 def show_contact(data=None):
-    if not data:
-        print("Contact list is empty!")
-        return
-
     if data is None:
         with open("data.json", "r", encoding="UTF-8") as file:
             data = json.load(file)
+    
+    if not data:
+        print("Contact list is empty!")
+        return False
 
     print(
         "=============== CONTACT LIST ===============\n\n",
@@ -24,25 +53,9 @@ def show_contact(data=None):
     )
 
 
-def add_contact(name, phone, email):
-    if not name.strip():
-        print("Name cannot be empty!")
-        return
-    elif len(name) > 50:
-        print("Name is too long!")
-        return
-    elif not phone.isdigit():
-        print("Phone number must contain digits only!")
-        return
-    elif not 9 <= len(phone) <= 15:
-        print("Phone number must be between 9 and 15 digits!")
-        return
-    elif len(email) > 254:
-        print("Email is too long!")
-        return
-    elif "@" not in email:
-        print("Email must contain '@'!")
-        return
+def add_contact(name: str, phone: str, email: str) -> bool:
+    if (not validate_name(name) or not validate_email(email) or not validate_phone(phone)):
+        return False
 
     with open("data.json", "r", encoding="UTF-8") as file:
         data = json.load(file)
@@ -59,18 +72,18 @@ def add_contact(name, phone, email):
     print("Contact added successfully!")
     return True
 
-def delete_contact(contact_id):
+def delete_contact(contact_id: str) -> bool:
     with open("data.json", "r", encoding="UTF-8") as file:
         old_data = json.load(file)
         new_data = {}
 
         if not contact_id.isdigit():
             print("Please enter a valid contact ID!")
-            return
+            return False
 
         if contact_id not in old_data:
             print("Contact ID does not exist!")
-            return
+            return False
 
         old_data.pop(contact_id)
 
@@ -84,62 +97,42 @@ def delete_contact(contact_id):
     return True
 
 
-def edit_contact(contact_id, mode="name"):
+def edit_contact(contact_id: str, mode="name") -> bool:
+    validators = {
+    "name": validate_name,
+    "phone": validate_phone,
+    "email": validate_email
+    }
+
+    prompts = {
+        "name": "Enter new name: ",
+        "phone": "Enter new phone number: ",
+        "email": "Enter new email: "
+    }
     mode = mode.lower()
 
     if mode not in ("name", "phone", "email"):
         print("Invalid mode!")
-        return
+        return False
 
     with open("data.json", "r", encoding="UTF-8") as file:
         data = json.load(file)
 
         if not contact_id.isdigit():
             print("Please enter a valid contact ID!")
-            return
+            return False
 
         if contact_id not in data:
             print("Contact ID does not exist!")
-            return
+            return False
 
-        if mode == "name":
-            while True:
-                new_value = input("Enter new name: ")
+        while True:
+            new_value = input(prompts[mode])
 
-                if not new_value.strip():
-                    print("Name cannot be empty!")
-                    continue
-                if len(new_value) > 50:
-                    print("Name is too long!")
-                    continue
+            if not validators[mode](new_value):
+                continue
 
-                break
-
-        elif mode == "phone":
-            while True:
-                new_value = input("Enter new phone number: ")
-
-                if not new_value.isdigit():
-                    print("Phone number must contain digits only!")
-                    continue
-                if not 9 <= len(new_value) <= 15:
-                    print("Phone number must be between 9 and 15 digits!")
-                    continue
-
-                break
-
-        else:
-            while True:
-                new_value = input("Enter new email: ")
-
-                if len(new_value) > 254:
-                    print("Email is too long!")
-                    continue
-                if "@" not in new_value:
-                    print("Email must contain '@'!")
-                    continue
-
-                break
+            break
 
         data[contact_id][mode] = new_value
 
@@ -149,21 +142,21 @@ def edit_contact(contact_id, mode="name"):
     print("Contact updated successfully!")
     return True
 
-def search_contact(keyword: str, mode="all"):
+def search_contact(keyword: str, mode="all") -> bool:
     if not isinstance(keyword, str):
         print("Invalid keyword!")
-        return
+        return False
 
     if not isinstance(mode, str) or mode not in ("name", "phone", "email", "all"):
         print("Invalid mode!")
-        return
+        return False
 
     keyword = keyword.lower()
     mode = mode.lower()
 
     if not keyword.strip():
         print("Keyword cannot be empty!")
-        return
+        return False
 
     with open("data.json", "r", encoding="UTF-8") as file:
         data = json.load(file)
@@ -182,10 +175,10 @@ def search_contact(keyword: str, mode="all"):
     return True
 
 
-def clear_contact(confirmation):
+def clear_contact(confirmation: str) -> bool:
     if not isinstance(confirmation, str):
         print("Invalid input!")
-        return
+        return False
 
     confirmation = confirmation.strip().lower()
 
