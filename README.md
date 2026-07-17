@@ -39,8 +39,9 @@ This project was developed as a personal learning project to practice Python fun
 
 ```text
 ContactManager/
-│
 ├── main.py
+├── contacts.py
+├── validators.py
 ├── data.json
 └── README.md
 ```
