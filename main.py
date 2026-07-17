@@ -1,47 +1,50 @@
 import json
 
-def show_contact(data=None):
-    if data is None:
-        with open("data.json", mode="r", encoding="UTF-8") as file_json:
-            data = json.load(file_json)
 
-            print("=============== CONTACT LIST ===============\n\n",
-            "\n".join(
-            f"[{contact}]\nTên: {contact_info['name']}\nSĐT: {contact_info['phone']}\nEmail: {contact_info['email']}\n"
-            for contact, contact_info in data.items()),
-            "\n=============== CONTACT LIST ===============\n",
-            sep=""
-            )
-    else:
-        print("=============== CONTACT LIST ===============\n\n",
+def show_contact(data=None):
+    if not data:
+        print("Contact list is empty!")
+        return
+
+    if data is None:
+        with open("data.json", "r", encoding="UTF-8") as file:
+            data = json.load(file)
+
+    print(
+        "=============== CONTACT LIST ===============\n\n",
         "\n".join(
-        f"[{contact}]\nTên: {contact_info['name']}\nSĐT: {contact_info['phone']}\nEmail: {contact_info['email']}\n"
-        for contact, contact_info in data.items()),
+            f"[{contact_id}]\n"
+            f"Name: {contact_info['name']}\n"
+            f"Phone: {contact_info['phone']}\n"
+            f"Email: {contact_info['email']}\n"
+            for contact_id, contact_info in data.items()
+        ),
         "\n=============== CONTACT LIST ===============\n",
         sep=""
-        )
+    )
+
+
 def add_contact(name, phone, email):
     if not name.strip():
-        print("Không được để tên rỗng!")
+        print("Name cannot be empty!")
         return
-    elif not len(name) <= 50:
-        print("Tên quá dài!")
+    elif len(name) > 50:
+        print("Name is too long!")
         return
     elif not phone.isdigit():
-        print("SĐT chỉ được chứa số!")
+        print("Phone number must contain digits only!")
         return
     elif not 9 <= len(phone) <= 15:
-        print("Độ dài SĐT không phù hợp!")
+        print("Phone number must be between 9 and 15 digits!")
         return
-    elif not len(email) <= 254:
-        print("Email quá dài!")
+    elif len(email) > 254:
+        print("Email is too long!")
         return
-    elif not "@" in email:
-        print("Email phải có ký tự @")
+    elif "@" not in email:
+        print("Email must contain '@'!")
         return
 
-    
-    with open("data.json", mode="r", encoding="UTF-8") as file:
+    with open("data.json", "r", encoding="UTF-8") as file:
         data = json.load(file)
 
         data[str(len(data) + 1)] = {
@@ -49,224 +52,227 @@ def add_contact(name, phone, email):
             "phone": phone,
             "email": email
         }
-    
-    with open("data.json", mode="w", encoding="UTF-8") as file:
+
+    with open("data.json", "w", encoding="UTF-8") as file:
         json.dump(data, file, indent=4, ensure_ascii=False)
 
-    print("Tạo thành công!")
+    print("Contact added successfully!")
     return True
 
-def delete_contact(STT):
-    with open("data.json", mode="r", encoding="UTF-8") as file:
+def delete_contact(contact_id):
+    with open("data.json", "r", encoding="UTF-8") as file:
         old_data = json.load(file)
-        new_data = dict()
+        new_data = {}
 
-        if not STT.isdigit():
-            print("Vui lòng nhập số và không để trống!")
+        if not contact_id.isdigit():
+            print("Please enter a valid contact ID!")
             return
-        
-        if STT not in old_data:
-            print("STT không tồn tại!")
-            return
-        
-        old_data.pop(STT)
 
-        for stt, stt_cu in enumerate(old_data, start=1):
-            new_data[str(stt)] = old_data[stt_cu]
-    
-    with open("data.json", mode="w", encoding="UTF-8") as file2:
-        json.dump(new_data, file2, indent=4, ensure_ascii=False)
-    
-    print("Đã xóa thành công!")
+        if contact_id not in old_data:
+            print("Contact ID does not exist!")
+            return
+
+        old_data.pop(contact_id)
+
+        for new_id, old_id in enumerate(old_data, start=1):
+            new_data[str(new_id)] = old_data[old_id]
+
+    with open("data.json", "w", encoding="UTF-8") as file:
+        json.dump(new_data, file, indent=4, ensure_ascii=False)
+
+    print("Contact deleted successfully!")
     return True
 
-def edit_contact(STT, mode="name"):
+
+def edit_contact(contact_id, mode="name"):
     mode = mode.lower()
 
     if mode not in ("name", "phone", "email"):
-        print("Mode không phù hợp!")
+        print("Invalid mode!")
         return
 
-
-
-    with open("data.json", mode="r", encoding="UTF-8") as file:
+    with open("data.json", "r", encoding="UTF-8") as file:
         data = json.load(file)
 
-        if not STT.isdigit():
-            print("Vui lòng nhập số!")
+        if not contact_id.isdigit():
+            print("Please enter a valid contact ID!")
             return
-        
-        if STT not in data:
-            print("STT không phù hợp")
+
+        if contact_id not in data:
+            print("Contact ID does not exist!")
             return
-            
+
         if mode == "name":
             while True:
-                new_value = input("Nhập tên mới: ")
+                new_value = input("Enter new name: ")
 
                 if not new_value.strip():
-                    print("Không được để tên rỗng!")
+                    print("Name cannot be empty!")
                     continue
                 if len(new_value) > 50:
-                    print("Tên quá dài!")
+                    print("Name is too long!")
                     continue
 
                 break
+
         elif mode == "phone":
             while True:
-                new_value = input("Nhập SĐT mới: ")
+                new_value = input("Enter new phone number: ")
 
                 if not new_value.isdigit():
-                    print("SĐT chỉ được chứa số!")
+                    print("Phone number must contain digits only!")
                     continue
                 if not 9 <= len(new_value) <= 15:
-                    print("Độ dài SĐT không phù hợp!")
+                    print("Phone number must be between 9 and 15 digits!")
                     continue
-                
+
                 break
+
         else:
             while True:
-                new_value = input("Nhập email mới: ")
+                new_value = input("Enter new email: ")
 
                 if len(new_value) > 254:
-                    print("Email quá dài!")
+                    print("Email is too long!")
                     continue
                 if "@" not in new_value:
-                    print("Email phải có ký tự @")
+                    print("Email must contain '@'!")
                     continue
 
                 break
-        
-        data[STT][mode] = new_value
-    
-    with open("data.json", mode="w", encoding="UTF-8") as file:
+
+        data[contact_id][mode] = new_value
+
+    with open("data.json", "w", encoding="UTF-8") as file:
         json.dump(data, file, indent=4, ensure_ascii=False)
-        print("Đã thay đổi thành công!")
-    
+
+    print("Contact updated successfully!")
     return True
-        
 
 def search_contact(keyword: str, mode="all"):
     if not isinstance(keyword, str):
-        print("keyword không phù hợp!")
+        print("Invalid keyword!")
         return
 
-    if mode not in ("name", "phone", "email", "all") or not isinstance(mode, str):
-        print("Mode không phù hợp!")
+    if not isinstance(mode, str) or mode not in ("name", "phone", "email", "all"):
+        print("Invalid mode!")
         return
-    
+
     keyword = keyword.lower()
     mode = mode.lower()
-    
-    if not keyword.strip():
-        print("Không được để trống!")
-        return
-    
-    with open("data.json", mode="r", encoding="UTF-8") as file:
-        data = json.load(file)
-        all_data  = {}
 
-        for stt, contact in data.items():
+    if not keyword.strip():
+        print("Keyword cannot be empty!")
+        return
+
+    with open("data.json", "r", encoding="UTF-8") as file:
+        data = json.load(file)
+        matched_contacts = {}
+
+        for contact_id, contact in data.items():
             if mode == "all":
                 if any(keyword in str(value).lower() for value in contact.values()):
-                    all_data[stt] = contact
+                    matched_contacts[contact_id] = contact
             else:
                 if keyword in str(contact[mode]).lower():
-                    all_data[stt] = contact
+                    matched_contacts[contact_id] = contact
 
-    show_contact(data=all_data)
+    show_contact(data=matched_contacts)
 
     return True
 
-def clear_contact(decide):
-    if not isinstance(decide, str):
-        print("Dữ liệu không hợp lệ!")
+
+def clear_contact(confirmation):
+    if not isinstance(confirmation, str):
+        print("Invalid input!")
         return
 
-    decide = decide.strip().lower()
+    confirmation = confirmation.strip().lower()
 
-    if decide == "y":
+    if confirmation == "y":
         with open("data.json", "w", encoding="UTF-8") as file:
             json.dump({}, file, ensure_ascii=False, indent=4)
-        print("Đã xóa!")
+        print("All contacts have been deleted!")
     else:
-        print("Đã hủy!")
+        print("Operation cancelled.")
 
     return True
 
 
 while True:
-    print('''
+    print("""
     ========== CONTACT MANAGER ==========
 
-    1. Xem danh bạ
-    2. Thêm liên hệ
-    3. Xóa liên hệ
-    4. Sửa liên hệ
-    5. Tìm kiếm liên hệ
-    6. Xóa toàn bộ danh bạ
-    7. Thoát
+    1. View Contacts
+    2. Add Contact
+    3. Delete Contact
+    4. Edit Contact
+    5. Search Contacts
+    6. Clear All Contacts
+    7. Exit
 
-    =====================================
-    ''')
-    choice = input("Nhập(1-7): ")
+    ====================================
+    """)
+
+    choice = input("Enter your choice (1-7): ")
 
     if not choice.isdigit():
-        print("Không hợp lệ!")
-        continue
-    
-    if not 1 <= int(choice) <= 7:
-        print("Vui lòng nhập từ 1-7")
+        print("Invalid input!")
         continue
 
-    
+    if not 1 <= int(choice) <= 7:
+        print("Please enter a number between 1 and 7.")
+        continue
+
     if choice == "1":
         show_contact()
-        input("Nhấn enter để tiếp tục!")
+        input("Press Enter to continue...")
+
     elif choice == "2":
         while True:
-            name = input("Nhập tên: ")
-            phone = input("Nhập SĐT: ")
-            email = input("Nhập email: ")
+            name = input("Enter name: ")
+            phone = input("Enter phone number: ")
+            email = input("Enter email: ")
 
             if add_contact(name, phone, email):
                 break
+
     elif choice == "3":
         while True:
-            stt = input("Nhập STT muốn xóa: ")
+            contact_id = input("Enter contact ID to delete: ")
 
-            if delete_contact(stt):
+            if delete_contact(contact_id):
                 break
+
     elif choice == "4":
         while True:
-            stt = input("Nhập stt: ")
-            mode = input("Nhập mode thay đổi: ")
+            contact_id = input("Enter contact ID: ")
+            mode = input("Enter field to edit (name/phone/email): ")
 
-            if edit_contact(stt, mode=mode):
+            if edit_contact(contact_id, mode):
                 break
+
     elif choice == "5":
         while True:
-            mode = input("Nhập mode tìm kiếm: ")
-            keyword = input("Nhập từ khóa tìm kiếm: ")
+            mode = input("Enter search mode (name/phone/email/all): ")
+            keyword = input("Enter keyword: ")
 
-            if search_contact(keyword=keyword, mode=mode):
-                input("Nhấn enter để tiếp tục: ")
+            if search_contact(keyword, mode):
+                input("Press Enter to continue...")
                 break
+
     elif choice == "6":
         while True:
-            decide = input("Bạn có chắc chắn muốn xóa hết không?(Y/N): ")
+            confirmation = input("Are you sure you want to delete all contacts? (Y/N): ")
 
-            if clear_contact(decide=decide):
+            if clear_contact(confirmation):
                 break
+
     elif choice == "7":
+        print("Goodbye!")
         break
+
     else:
-        print("Chương trình gặp lỗi!")
+        print("Unexpected error occurred.")
 else:
-    print("Chương trình gặp lỗi!")
-
-
-
-
-    
-    
+    print("Unexpected error occurred.")
