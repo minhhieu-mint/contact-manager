@@ -1,0 +1,17 @@
+{
+    "1": {
+        "name": "Nguyen Van A",
+        "phone": "0987654321",
+        "email": "a@gmail.com"
+    },
+    "2": {
+        "name": "Nguyen Van B",
+        "phone": "0123456789",
+        "email": "b@gmail.com"
+    },
+    "3": {
+        "name": "nguyen van C",
+        "phone": "0947187352",
+        "email": "c@gmail.com"
+    }
+}
