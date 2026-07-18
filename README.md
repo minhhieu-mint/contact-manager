@@ -53,7 +53,7 @@ ContactManager/
 Clone the repository to your computer.
 
 ```bash
-git clone https://github.com/your-username/ContactManager.git
+git clone https://github.com/minhhieu-mint/contact-manager
 ```
 
 Move into the project directory.
